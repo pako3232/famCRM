@@ -1,8 +1,9 @@
 <template>
-  <div id="app">
-    <router-view /> <!-- Здесь будут отображаться компоненты для каждого маршрута -->
-  </div>
+  <v-app>
+    <router-view />
+  </v-app>
 </template>
+
 
 <script>
 import axios from 'axios'
@@ -10,3 +11,5 @@ export default {
   name: 'App'
 };
 </script>
+<style>
+</style>

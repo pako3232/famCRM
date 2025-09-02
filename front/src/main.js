@@ -3,4 +3,11 @@ import './style.css'
 import App from './App.vue'
 import router from './router'
 
-createApp(App).use(router).mount('#app')
+
+import vuetify from './plugins/vuetify'  // импорт объекта Vuetify
+
+import '@mdi/font/css/materialdesignicons.css'  // обязательно
+
+const app = createApp(App);
+
+app.use(vuetify).use(router).mount('#app')

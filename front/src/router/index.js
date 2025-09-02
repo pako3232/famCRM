@@ -2,6 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../views/login.vue'
 import adminka from '../views/adminka.vue'
 import florist from '../views/florist.vue'
+import saleForm from '../views/saleForm.vue'
+import test from '../views/test.vue'
+import reports from '../views/reports.vue'
 
 const routes = [
     {
@@ -11,17 +14,32 @@ const routes = [
     {
         path: '/login',
         name: 'Login',
-        component: Login,
+        component: Login
     },
     {
         path: '/adminka',
         name: 'adminka',
-        component: adminka,
+        component: adminka
     },
     {
         path: '/florist',
         name: 'florist',
-        component: florist,
+        component: florist
+    },
+    {
+        path: '/saleForm',
+        name: 'saleForm',
+        component: saleForm
+    },
+    {
+        path: '/test',
+        name: 'test',
+        component: test
+    },
+    {
+        path: '/reports',
+        name: 'reports',
+        component: reports
     }
 ];
 
@@ -41,7 +59,7 @@ router.beforeEach((to, from, next) => {
     }
 
     // Если роль есть и это флорист
-    if (role === 'florist' && to.path !== '/florist') {
+    if (role === 'florist' && to.path == '/login') {
         console.log('флорист');
         return next('/florist');
     }
