@@ -7,15 +7,16 @@
                 <h2 class="mb-2">Новая продажа</h2>
                 <div v-for="(flower, index) in flowers" :key="index" class="new-flower">
                     <v-autocomplete style="flex: 16;" hide-details density="compact" class="custom-autocomplete"
-                        :return-object="true" v-model="flower.selected" :items="flowerOptions" :item-title="getFlowerLabel"
-                        placeholder="Выберите цветок">
+                        :return-object="true" v-model="flower.selected" :items="flowerOptions"
+                        :item-title="getFlowerLabel" placeholder="Выберите цветок">
 
                         <template v-slot:selection="{ item }">
                             <span>{{ item.raw.name }} — {{ item.raw.price }}₽</span>
                         </template>
                     </v-autocomplete>
-                    <v-number-input style="flex: 9" controlVariant="split" v-model="flower.quantity" @input="onPhoneInput"
-                        placeholder="Кол-во" hide-details density="compact" class="custom-autocomplete custom-number-input">
+                    <v-number-input style="flex: 9" controlVariant="split" v-model="flower.quantity"
+                        @input="onPhoneInput" placeholder="Кол-во" hide-details density="compact"
+                        class="custom-autocomplete custom-number-input">
                     </v-number-input>
 
 
@@ -42,8 +43,8 @@
             <div class="bonus-container">
                 <div class="bonus-check-container">
                     <p>Бонусная программа</p>
-                    <v-text-field type="tel" v-model="formattedPhone" @input="onPhoneInput" placeholder="+7 (___) ___-__-__"
-                        hide-details density="compact" class="custom-autocomplete ">
+                    <v-text-field type="tel" v-model="formattedPhone" @input="onPhoneInput"
+                        placeholder="+7 (___) ___-__-__" hide-details density="compact" class="custom-autocomplete ">
                     </v-text-field>
 
                     <v-btn @click="checkBonus" style="color: white !important" color="customBlue"
@@ -79,8 +80,8 @@
                 <div class="delivery-check">
                     <p>Доставка</p>
                     <input type="checkbox" v-model="delivery" name="" id="">
-                    <v-text-field v-if="delivery" type="number" v-model="deliveryPrice" placeholder="Стоимость доставки"
-                        hide-details density="compact" class="custom-autocomplete ">
+                    <v-text-field min="0" v-if="delivery" type="number" v-model="deliveryPrice"
+                        placeholder="Стоимость доставки" hide-details density="compact" class="custom-autocomplete ">
                     </v-text-field>
                 </div>
 
@@ -101,7 +102,7 @@
         </div>
     </v-container>
 </template>
-  
+
 <script>
 import Multiselect from '@vueform/multiselect'
 import '@vueform/multiselect/themes/default.css'
@@ -113,14 +114,14 @@ export default {
         Multiselect
     },
     mounted() {
-        axios.get('http://192.168.0.179:3000/getFlowers')
+        axios.get('http://localhost:3000/getFlowers')
             .then(res => {
                 this.flowerOptions = res.data.info
             })
             .catch(err => {
                 console.log(err)
             })
-        axios.get("http://192.168.0.179:3000/getPackages")
+        axios.get("http://localhost:3000/getPackages")
             .then(res => {
                 this.packageOptions = res.data.info
                 console.log(this.packageOptions)
@@ -169,7 +170,7 @@ export default {
         checkBonus() {
             this.isCheckingBounus = true
             this.activeBonsuButton = ''
-            axios.post("http://192.168.0.179:3000/bonusCheck", {
+            axios.post("http://localhost:3000/bonusCheck", {
                 phoneNumber: this.phoneNumber
             })
                 .then(res => {
@@ -212,7 +213,7 @@ export default {
         },
         push() {
             console.log(this.flowers)
-            axios.post("http://192.168.0.179:3000/pushSale", {
+            axios.post("http://localhost:3000/pushSale", {
                 flowers: this.flowers,
                 package: this.package == '' ? null : this.package.id,
                 discount: this.discount,
@@ -220,6 +221,7 @@ export default {
                 deliveryPrice: this.deliveryPrice,
                 fullPrice: this.fullPrice,
                 discountedPrice: this.discountedPrice,
+                date: new Date().toISOString().slice(0, 19).replace("T", " "),
                 clientID: this.clientID,
                 userID: localStorage.getItem("userID")
 
@@ -371,7 +373,8 @@ export default {
 .price-container {
     text-align: start;
 }
-.price-container h2{
+
+.price-container h2 {
     color: #76ff03
 }
 
@@ -447,4 +450,3 @@ export default {
   outline: 1px solid rgba(0, 0, 255, 0.2);
 } */
 </style>
-  

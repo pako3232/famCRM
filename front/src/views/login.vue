@@ -21,7 +21,7 @@ export default {
     },
     methods: {
         auth() {
-            axios.post("http://192.168.0.179:3000/auth", {
+            axios.post("http://localhost:3000/auth", {
                 login: this.login,
                 password: this.password
             })

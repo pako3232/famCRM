@@ -1,0 +1,29 @@
+<v-autocomplete style="flex: 16;" hide-details density="compact" class="custom-autocomplete"
+                        :return-object="true" v-model="flower.selected" :items="flowerOptions"
+                        :item-title="getFlowerLabel" placeholder="Выберите цветок"
+                        :menu-props="{ maxWidth: 800, offsetY: true, contentClass: 'flower-menu-content' }"
+                        :search-input.sync="flower.search" 
+                        >
+                        <!-- выбранный элемент (отображается в поле после выбора) -->
+                        <template #selection="{ item }">
+                            <span v-if="item && item.raw">
+                                <img v-if="item.raw.image" :src="item.raw.image" class="selected-thumb" />
+                                {{ item.raw.name }} — {{ item.raw.price }}₽
+                            </span>
+                        </template>
+
+                        <!-- кастомный рендер для каждого элемента в выпадающем списке -->
+                        <template #item="{ item, props }">
+                            <v-list-item v-bind="props" class="flower-list-item">
+                                <div class="flower-card">
+                                    <div class="flower-img-wrap">
+                                        <img src="../../img/zaglushka.png" alt="img" class="flower-img" />
+                                    </div>
+                                    <div class="flower-info">
+                                        <div class="flower-name">{{ item.name }}</div>
+                                        <div class="flower-price">{{ item.price }}₽</div>
+                                    </div>
+                                </div>
+                            </v-list-item>
+                        </template>
+                    </v-autocomplete>

@@ -98,11 +98,11 @@ app.get("/getPackages", (req, res) => {
 app.post("/pushSale", (req, res) => {
     console.log(req.body)
 
-    const { flowers, package, discount, bonus, deliveryPrice, fullPrice, discountedPrice, clientID, userID } = req.body
+    const { flowers, package, discount, bonus, deliveryPrice, fullPrice, discountedPrice, date, clientID, userID } = req.body
 
-    let query = "INSERT INTO sales (packageID, discount, deliverPrice, price, discountedPrice, clientID, userID) VALUES (?, ?, ?, ?, ?, ?, ?)"
+    let query = "INSERT INTO sales (packageID, discount, deliverPrice, price, discountedPrice, date, clientID, userID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
 
-    db.run(query, [package, discount, deliveryPrice, fullPrice, discountedPrice, clientID, userID], function (err) {
+    db.run(query, [package, discount, deliveryPrice, fullPrice, discountedPrice, date, clientID, userID], function (err) {
         if (err) {
             console.log(err)
             return res.status(500).send({ message: "Ошибка добавления данных" })
@@ -161,6 +161,93 @@ app.post("/pushSale", (req, res) => {
     })
 })
 
-app.listen(PORT, '192.168.0.179', () => {
-    console.log(`Сервер запущен на http://192.168.0.179:${PORT}`);
+app.get("/getAll", (req, res) => {
+
+    const sql = `SELECT
+                    s.id as saleID,
+                    s.packageID,
+                    s.discount,
+                    s.deliverPrice,
+                    s.price,
+                    s.discountedPrice,
+                    u.FIO as florist,
+                    s.date,
+                    f.name,
+                    f.price as flowerPrice,
+                    sf.flower as flowerID,
+                    sf.quantity,
+                    c.name as clientName,
+                    c.phoneNumber,
+                    p.name as packageName,
+                    p.price as packagePrice
+                    FROM sales s
+                    LEFT JOIN sales_flowers sf ON s.id = sf.saleID
+                    LEFT JOIN flowers f ON sf.flower = f.id
+                    LEFT JOIN clients c on s.clientID = c.id
+                    LEFT JOIN packages p on s.packageID = p.id
+                    LEFT JOIN users u on s.userID = u.id
+                    ORDER BY s.id DESC`
+
+    db.all(sql, (err, sales) => {
+        if (err) {
+            console.log(err)
+            return res.status(500).send({ error: "Ошибка при получении данных о прадажах" })
+        }
+        const fullSales = {}
+
+        sales.forEach(sale => {
+            let formattedDate = null;
+            if (sale.date) {
+                formattedDate = new Date(sale.date.replace(" ", "T") + "Z").toLocaleString("ru-RU", {
+                    timeZone: "Asia/Novosibirsk",   // можно поменять на свой
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit"
+                });
+            }
+            if (!fullSales[sale.saleID]) {
+                fullSales[sale.saleID] = {
+                    id: sale.saleID,
+                    packageID: sale.packageID,
+                    discount: sale.discount,
+                    deliveryPrice: sale.deliverPrice,
+                    price: sale.price,
+                    discountedPrice: sale.discountedPrice,
+                    userID: sale.userID,
+                    date: formattedDate,
+                    clientName: sale.clientName,
+                    phoneNumber: sale.phoneNumber,
+                    packageName: sale.packageName,
+                    packagePrice: sale.packagePrice,
+                    florist: sale.florist,
+                    flowers: []
+                }
+
+            }
+            if (sale.flowerID) {
+                fullSales[sale.saleID].flowers.push({
+                    flowerID: sale.flowerID,
+                    quantity: sale.quantity,
+                    name: sale.name,
+                    price: sale.flowerPrice
+                })
+            }
+
+        })
+
+        const fullSalesArr = Object.values(fullSales)
+        fullSalesArr.reverse()
+        console.log(fullSalesArr)
+        res.status(200).send({
+            sales: fullSalesArr
+        })
+
+    })
+})
+
+app.listen(PORT, () => {
+    console.log(`Сервер запущен на http://loaclhost:${PORT}`);
 });
